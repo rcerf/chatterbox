@@ -1,32 +1,52 @@
 $(function(){ // on ready
-
   if(!('contains' in String.prototype))
     String.prototype.contains = function(str, startIndex) { return -1 !== String.prototype.indexOf.call(this, str, startIndex); };
 
   var timelineLength = 0;
-  window.username = window.location.search.slice(10);
-  window.roomname = "default";
+  var username = window.location.search.slice(10);
+  var roomname = "default";
+  var usernames = {};
+  var chatrooms = {};
+  var messages = {};
+  var followed = {};
 
   var displayMessages = function(){
     $.get( "https://api.parse.com/1/classes/chatterbox", function( data ) {
-      var chatRooms = {};
-      window.messages = data.results;
-      for (var i = timelineLength; i < window.messages.length; i++){
-        var mes = window.messages[i];
+      messages = data.results;
+      for (var i = timelineLength; i < messages.length; i++){
+        var mes = messages[i];
         $('.timeline').append($("<div>"));
-        $('.timeline > div').last().addClass('username');
-        $('.username').last().text(mes.username + ": ");
-        $('.username').last().append($('<span>'));
-        $('.username > span').last().addClass('message');
+        $('.timeline > div').last().addClass('post');
+        $('.post').last().append($("<span>"));
+        $('.post > span').last().addClass('username').text(mes.username + ": ");
+        $('.post').last().append($('<span>'));
+        if (followed[mes.username]){
+          $('.post').last().addClass('followed');
+        }
+        $('.username').last().on('click', function(){
+          followed[$(this).text().slice(0,-2)] = $(this).text().slice(0,-2);
+          // $('.username').addClass('followed');
+          var $that = $(this);
+          for (var i = 0; i < $('.username').length; i++){
+            if ($($(".username")[i]).text() === $that.text()){
+              console.log('hey')
+              $($(".username")[i]).addClass('followed');
+            }
+          }
+        });
+        $('.post > span').last().addClass('message');
         $('.message').last().text(mes.text);
-        if (!chatRooms[mes.roomname]) {
-          chatRooms[mes.roomname] = true;
+        if (!chatrooms[mes.roomname]) {
+          chatrooms[mes.roomname] = false;
         }
       }
-      for (var keys in chatRooms){
-        $('.room-option').append($("<option>"));
-        $('.room-option > option').last().text(keys);
-      } // breaks?
+      for (var keys in chatrooms){
+        if (!chatrooms[keys]) {
+          $('.room-option').append($("<option>"));
+          $('.room-option > option').last().text(keys);
+          chatrooms[keys] = true;
+        }
+      } 
       timelineLength = messages.length;
     });
   };
@@ -38,9 +58,9 @@ $(function(){ // on ready
     // window.username = $('option:selected');
     var text = $('input[name=post]').val();
     var message = {
-      'username': window.username,
+      'username': username,
       'text': text,
-      'roomname': window.roomname
+      'roomname': roomname
     };
     console.log(message);
 
@@ -69,14 +89,17 @@ $(function(){ // on ready
   $('.addUsername').on('click',function(e){
     e.preventDefault();
     var newUsername = prompt("Add new username:" || 'anonymous');
-    $(".username-option").append($('<option>'));
-    $('.username-option > option').last().text(newUsername);
-    window.username = newUsername;
+    if (!usernames[newUsername]) {
+      $(".username-option").append($('<option>'));
+      $('.username-option > option').last().text(newUsername);
+      username = newUsername;
+      usernames[newUsername] = newUsername;
+    }
   });
 
   $('#usernames').change(function(){
     console.log('changed');
-    window.username = $('#usernames :selected').text();
+    username = $('#usernames :selected').text();
   });
 
   var appendDiv = function(mes){
@@ -91,14 +114,14 @@ $(function(){ // on ready
   $('#rooms').change(function(){
     $('.timeline').empty();
     if ($('#rooms :selected').text() === "All chat rooms"){
-      for (var i = 0; i < window.messages.length; i++){
-        var mes = window.messages[i];
+      for (var i = 0; i < messages.length; i++){
+        var mes = messages[i];
         appendDiv(mes);
       }
     } else {
-      for (var i = 0; i < window.messages.length; i++){
-        var mes = window.messages[i];
-        if (mes.roomname === $('#rooms :selected').text()) {
+      for (var i = 0; i < messages.length; i++){
+        var mes = messages[i];
+        if (mes.roomname === $('#rooms :selected').val()) {
           appendDiv(mes);
         }
       }
@@ -108,9 +131,15 @@ $(function(){ // on ready
   $('.addChatroom').on('click',function(e){
     e.preventDefault();
     var newChatroom = prompt("Add new chatroom:" || 'default');
-    $(".room-option").append($('<option>'));
-    $('.room-option > option').last().text(newChatroom);
-    window.roomname = newChatroom;
+    if (!chatrooms[newChatroom]){
+      $(".room-option").append($('<option>'));
+      $('.room-option > option').last().text(newChatroom);
+      roomname = newChatroom;
+      chatrooms[newChatroom] = newChatroom;
+    }
   });
+  // var boldFriends = function(){
+  //   if($(".username").text() === 
+  // }
 
 });
