@@ -4,7 +4,7 @@ $(function(){ // on ready
     String.prototype.contains = function(str, startIndex) { return -1 !== String.prototype.indexOf.call(this, str, startIndex); };
 
   var timelineLength = 0;
-  var username = window.location.search.slice(10);
+  window.username = window.location.search.slice(10);
 
   var displayMessages = function(){
     $.get( "https://api.parse.com/1/classes/chatterbox", function( data ) {
@@ -34,6 +34,7 @@ $(function(){ // on ready
 
   var postMessage = function(e){
     e.preventDefault();
+    // window.username = $('option:selected');
     var text = $('input[name=post]').val();
     var message = {
       'username': window.username,
@@ -41,7 +42,6 @@ $(function(){ // on ready
       'roomname': 'lolroom'
     };
 
-    console.log('message!!!!', message);
     $.ajax({
       url: 'https://api.parse.com/1/classes/chatterbox',
       type: 'POST',
@@ -64,11 +64,13 @@ $(function(){ // on ready
   // $(".username-option").append($('<option>'));
   // $('.username-option > option').last().addClass("addUsername").text("add username");
 
-  $('.addUsername').on('click', function(){
+  $('.addUsername').on('click',function(e){
+    e.preventDefault();
     console.log('changed');
-    var newUsername = prompt("Add new username:");
-    $(".username-option").prepend($('<option>'));
-    $('.username-option > option').first().text(newUsername);
+    var newUsername = prompt("Add new username:" || 'anonymous');
+    $(".username-option").append($('<option>'));
+    $('.username-option > option').last().text(newUsername);
+    window.username = newUsername;
   });
 
 });
