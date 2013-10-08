@@ -11,14 +11,32 @@
     
     <!-- internal javascript -->
     <script src="scripts/config.js"></script>
-    <script src="scripts/app.js"></script>
   </head>
   <body>
-
     <div id="main">
       <h1>Chat-Client</h1>
+      <div class = "input"> 
+            <form>
+       <fieldset>
+          <legend>Select your options:</legend>
+          <p>
+             <label>Your username:</label>
+             <select class="username-option">
+               <option class="addUsername">Add username</option>
+             </select>
+             <label>Chat room:</label>
+             <select class="room-option">
+             </select>
+          </p>
+       </fieldset>
+    </form>
+        <form>
+          <input name="post" autofocus>
+          <input name="submit" type="submit"></input>
+        </form>
+      </div>
       <div class = "timeline"></div>
     </div>
-
+    <script src="scripts/app.js"></script>
   </body>
 </html>
