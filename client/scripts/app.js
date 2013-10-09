@@ -29,7 +29,6 @@ $(function(){ // on ready
           var $that = $(this);
           for (var i = 0; i < $('.username').length; i++){
             if ($($(".username")[i]).text() === $that.text()){
-              console.log('hey')
               $($(".username")[i]).addClass('followed');
             }
           }
@@ -53,17 +52,7 @@ $(function(){ // on ready
   displayMessages();
   setInterval(displayMessages, 3000);
 
-  var postMessage = function(e){
-    e.preventDefault();
-    // window.username = $('option:selected');
-    var text = $('input[name=post]').val();
-    var message = {
-      'username': username,
-      'text': text,
-      'roomname': roomname
-    };
-    console.log(message);
-
+  var addPost = function(message){
     $.ajax({
       url: 'https://api.parse.com/1/classes/chatterbox',
       type: 'POST',
@@ -73,10 +62,22 @@ $(function(){ // on ready
         console.log('chatterbox: Message sent');
       },
       error: function (data) {
-    // see https://developer.mozilla.org/en-US/docs/Web/API/console.error
-      console.error('chatterbox: Failed to send message');
+        // see https://developer.mozilla.org/en-US/docs/Web/API/console.error
+        console.error('chatterbox: Failed to send message');
       }
     });
+  };
+
+  var postMessage = function(e){
+    e.preventDefault();
+    // window.username = $('option:selected');
+    var text = $('input[name=post]').val();
+    var message = {
+      'username': username,
+      'text': text,
+      'roomname': roomname
+    };
+    addPost(message);
   };
 
   $('input[type=submit]').on('click', postMessage);
@@ -138,8 +139,5 @@ $(function(){ // on ready
       chatrooms[newChatroom] = newChatroom;
     }
   });
-  // var boldFriends = function(){
-  //   if($(".username").text() === 
-  // }
 
 });

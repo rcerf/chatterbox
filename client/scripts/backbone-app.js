@@ -13,6 +13,7 @@ var NewMessageView = Backbone.View.extend({
 
   initialize: function(){
     this.collection.on('add', this.clearInput, this);
+
   },
 
   addMessage: function(e) {
