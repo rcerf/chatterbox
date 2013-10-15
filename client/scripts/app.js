@@ -14,9 +14,7 @@ $(function(){ // on ready
     var url = "http://127.0.0.1:8080/classes/" + $('.room-option :selected').val();
     $.get( url, function( data ) {
       $(".timeline").html("");
-      data = JSON.parse(data);
-      messages = data.results;
-      console.log(messages);
+      messages = data;
       for (var i = 0; i < messages.length; i++){
         var mes = messages[i];
         $('.timeline').append($("<div>"));
@@ -63,7 +61,6 @@ $(function(){ // on ready
       data: JSON.stringify(message),
       contentType: 'application/json',
       success: function (data) {
-        console.log(data);
         console.log('chatterbox: Message sent');
       },
       error: function (data) {
