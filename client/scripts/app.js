@@ -4,16 +4,20 @@ $(function(){ // on ready
 
   var timelineLength = 0;
   var username = window.location.search.slice(10);
-  var roomname = "default";
+  var roomname = "messages";
   var usernames = {};
   var chatrooms = {};
   var messages = {};
   var followed = {};
 
   var displayMessages = function(){
-    $.get( "https://api.parse.com/1/classes/chatterbox", function( data ) {
+    var url = "http://127.0.0.1:8080/classes/" + $('.room-option :selected').val();
+    $.get( url, function( data ) {
+      $(".timeline").html("");
+      data = JSON.parse(data);
       messages = data.results;
-      for (var i = timelineLength; i < messages.length; i++){
+      console.log(messages);
+      for (var i = 0; i < messages.length; i++){
         var mes = messages[i];
         $('.timeline').append($("<div>"));
         $('.timeline > div').last().addClass('post');
@@ -45,20 +49,21 @@ $(function(){ // on ready
           $('.room-option > option').last().text(keys);
           chatrooms[keys] = true;
         }
-      } 
+      }
       timelineLength = messages.length;
     });
   };
   displayMessages();
   setInterval(displayMessages, 3000);
 
-  var addPost = function(message){
+  var addPost = function(message, url){
     $.ajax({
-      url: 'https://api.parse.com/1/classes/chatterbox',
+      url: url,
       type: 'POST',
       data: JSON.stringify(message),
       contentType: 'application/json',
       success: function (data) {
+        console.log(data);
         console.log('chatterbox: Message sent');
       },
       error: function (data) {
@@ -72,12 +77,15 @@ $(function(){ // on ready
     e.preventDefault();
     // window.username = $('option:selected');
     var text = $('input[name=post]').val();
+    roomname = $('.room-option :selected').val();
     var message = {
       'username': username,
       'text': text,
       'roomname': roomname
     };
-    addPost(message);
+
+    var url = 'http://127.0.0.1:8080/classes/' + roomname;
+    addPost(message, url);
   };
 
   $('input[type=submit]').on('click', postMessage);
@@ -99,7 +107,6 @@ $(function(){ // on ready
   });
 
   $('#usernames').change(function(){
-    console.log('changed');
     username = $('#usernames :selected').text();
   });
 
@@ -113,20 +120,7 @@ $(function(){ // on ready
   };
 
   $('#rooms').change(function(){
-    $('.timeline').empty();
-    if ($('#rooms :selected').text() === "All chat rooms"){
-      for (var i = 0; i < messages.length; i++){
-        var mes = messages[i];
-        appendDiv(mes);
-      }
-    } else {
-      for (var i = 0; i < messages.length; i++){
-        var mes = messages[i];
-        if (mes.roomname === $('#rooms :selected').val()) {
-          appendDiv(mes);
-        }
-      }
-    }
+    displayMessages();
   });
 
   $('.addChatroom').on('click',function(e){
