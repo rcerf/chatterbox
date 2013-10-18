@@ -11,10 +11,11 @@ $(function(){ // on ready
   var followed = {};
 
   var displayMessages = function(){
-    var url = "http://127.0.0.1:8080/classes/" + $('.room-option :selected').val();
+    var url = "http://127.0.0.1:8080/classes/" + $('.room-option :selected').val() + "/";
     $.get( url, function( data ) {
       $(".timeline").html("");
       messages = data;
+      console.log(messages);
       for (var i = 0; i < messages.length; i++){
         var mes = messages[i];
         $('.timeline').append($("<div>"));
@@ -81,7 +82,7 @@ $(function(){ // on ready
       'roomname': roomname
     };
 
-    var url = 'http://127.0.0.1:8080/classes/' + roomname;
+    var url = 'http://127.0.0.1:8080/classes/' + roomname + "/";
     addPost(message, url);
   };
 
